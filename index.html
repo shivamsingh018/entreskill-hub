@@ -31,6 +31,7 @@
       <a class="nav-link" data-view="dashboard" href="#dashboard">My Roadmap</a>
       <a class="nav-link" data-view="learning" href="#learning">Learning Hub</a>
       <a class="nav-link" data-view="mentorship" href="#mentorship">Mentorship</a>
+      <a class="nav-link" id="nav-link-chat" href="#chat" onclick="toggleChatbot(true); return false;">Chat Support</a>
       <a class="nav-link" id="nav-link-admin" data-view="admin" href="#admin" style="display:none; color:var(--accent);">Admin Panel</a>
     </nav>
     
@@ -117,9 +118,52 @@
 
   </main>
 
-  <!-- Login/Register Authentication Modal Overlay -->
-  <div id="auth-modal" class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
-    <!-- Populated dynamically via app.js -->
+  <!-- AI Assistant Chatbot Floating Widget -->
+  <div id="chatbot-widget" class="chatbot-widget">
+    <!-- Floating Trigger Button -->
+    <button id="chatbot-toggle-btn" class="chatbot-toggle-btn" onclick="toggleChatbot()" aria-label="Open AI Assistant Chatbot">
+      <span class="chatbot-btn-icon">💬</span>
+      <span class="chatbot-btn-text">AI Support</span>
+      <span class="chatbot-unread-dot"></span>
+    </button>
+
+    <!-- Chat Window Container -->
+    <div id="chatbot-window" class="chatbot-window">
+      <div class="chatbot-header">
+        <div class="chatbot-header-info">
+          <div class="chatbot-avatar">🌱</div>
+          <div>
+            <div class="chatbot-title">EntreSkill AI Assistant</div>
+            <div class="chatbot-status"><span class="status-dot"></span> Online • Instant Guidance</div>
+          </div>
+        </div>
+        <div class="chatbot-actions">
+          <button class="chatbot-icon-btn" onclick="clearChatbotHistory()" title="Clear Chat">🗑️</button>
+          <button class="chatbot-icon-btn" onclick="toggleChatbot(false)" title="Close Chat">✕</button>
+        </div>
+      </div>
+
+      <!-- Quick Suggestion Pills -->
+      <div class="chatbot-suggestions">
+        <div class="suggestion-chip" onclick="sendQuickPrompt('How do I calculate unit selling price for my products?')">💡 Pricing Math</div>
+        <div class="suggestion-chip" onclick="sendQuickPrompt('What licenses do I need for a home bakery or food service?')">📜 Home Permits</div>
+        <div class="suggestion-chip" onclick="sendQuickPrompt('How do I get my first 10 tailoring clients locally?')">📣 First 10 Clients</div>
+        <div class="suggestion-chip" onclick="sendQuickPrompt('Where can I source wholesale mobile repair tools?')">🔧 Tool Sourcing</div>
+      </div>
+
+      <!-- Chat Messages Scroll Box -->
+      <div id="chatbot-messages" class="chatbot-messages">
+        <!-- Message bubbles populated via app.js -->
+      </div>
+
+      <!-- Chat Input Controls -->
+      <form class="chatbot-input-form" onsubmit="handleChatbotSubmit(event)">
+        <input type="text" id="chatbot-input" placeholder="Ask any startup, legal, or pricing question..." autocomplete="off">
+        <button type="submit" class="btn btn-primary chatbot-send-btn">
+          <span>Send</span> ➔
+        </button>
+      </form>
+    </div>
   </div>
 
   <!-- Javascript Logic Files -->

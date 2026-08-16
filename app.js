@@ -208,7 +208,8 @@ let STATE = {
   qnaThreads: [],
   quizScores: {}, // { 'lesson-id': score }
   lessonsVerified: [], // List of lesson IDs verified by admin
-  mentorRegistrations: [] // List of pending mentor registrations
+  mentorRegistrations: [], // List of pending mentor registrations
+  chatHistory: [] // Chatbot message history
 };
 
 // --- INITIALIZATION & LOCALSTORAGE ---
@@ -216,6 +217,7 @@ function initApp() {
   loadStateFromLocalStorage();
   setupEventListeners();
   renderApp();
+  renderChatbotMessages();
 }
 
 function loadStateFromLocalStorage() {
@@ -233,6 +235,17 @@ function loadStateFromLocalStorage() {
   // Set default Q&A data if empty
   if (!STATE.qnaThreads || STATE.qnaThreads.length === 0) {
     STATE.qnaThreads = [...MOCK_DATA.qna];
+  }
+
+  // Set default Chatbot welcome message if empty
+  if (!STATE.chatHistory || STATE.chatHistory.length === 0) {
+    STATE.chatHistory = [
+      {
+        sender: 'assistant',
+        text: "Hello! 🌱 I'm your EntreSkill AI Startup Assistant. Ask me anything about finding business ideas, legal permits, unit pricing calculations, or finding customers!",
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }
+    ];
   }
 }
 
@@ -1520,3 +1533,148 @@ function setupEventListeners() {
 
 // Initialize on load
 window.addEventListener('DOMContentLoaded', initApp);
+
+// ==========================================
+// AI ASSISTANT CHATBOT CONTROLLER LOGIC
+// ==========================================
+
+window.toggleChatbot = function(forceState) {
+  const windowEl = document.getElementById('chatbot-window');
+  if (!windowEl) return;
+
+  if (typeof forceState === 'boolean') {
+    if (forceState) {
+      windowEl.classList.add('active');
+    } else {
+      windowEl.classList.remove('active');
+    }
+  } else {
+    windowEl.classList.toggle('active');
+  }
+
+  if (windowEl.classList.contains('active')) {
+    const inputEl = document.getElementById('chatbot-input');
+    if (inputEl) inputEl.focus();
+    renderChatbotMessages();
+  }
+};
+
+window.renderChatbotMessages = function() {
+  const container = document.getElementById('chatbot-messages');
+  if (!container) return;
+
+  if (!STATE.chatHistory || STATE.chatHistory.length === 0) {
+    STATE.chatHistory = [
+      {
+        sender: 'assistant',
+        text: "Hello! 🌱 I'm your EntreSkill AI Startup Assistant. Ask me anything about finding business ideas, legal permits, unit pricing calculations, or finding customers!",
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }
+    ];
+  }
+
+  container.innerHTML = STATE.chatHistory.map(msg => `
+    <div class="chat-bubble ${msg.sender}">
+      <div>${msg.text}</div>
+      <div class="msg-time">${msg.time}</div>
+    </div>
+  `).join('');
+
+  // Scroll to bottom
+  container.scrollTop = container.scrollHeight;
+};
+
+window.handleChatbotSubmit = function(e) {
+  if (e) e.preventDefault();
+
+  const inputEl = document.getElementById('chatbot-input');
+  if (!inputEl) return;
+
+  const queryText = inputEl.value.trim();
+  if (!queryText) return;
+
+  const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  // Add User Message
+  STATE.chatHistory.push({
+    sender: 'user',
+    text: queryText,
+    time: currentTime
+  });
+
+  inputEl.value = '';
+  renderChatbotMessages();
+  saveStateToLocalStorage();
+
+  // Show Typing Indicator
+  const messagesContainer = document.getElementById('chatbot-messages');
+  const typingIndicator = document.createElement('div');
+  typingIndicator.className = 'typing-indicator';
+  typingIndicator.id = 'chatbot-typing-indicator';
+  typingIndicator.innerHTML = `
+    <div class="typing-dot"></div>
+    <div class="typing-dot"></div>
+    <div class="typing-dot"></div>
+  `;
+  messagesContainer.appendChild(typingIndicator);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+  // Simulate AI Response with knowledge engine
+  setTimeout(() => {
+    const indicatorEl = document.getElementById('chatbot-typing-indicator');
+    if (indicatorEl) indicatorEl.remove();
+
+    const responseText = generateAIResponse(queryText);
+    STATE.chatHistory.push({
+      sender: 'assistant',
+      text: responseText,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    });
+
+    saveStateToLocalStorage();
+    renderChatbotMessages();
+  }, 1000);
+};
+
+window.sendQuickPrompt = function(promptText) {
+  const inputEl = document.getElementById('chatbot-input');
+  if (inputEl) {
+    inputEl.value = promptText;
+    handleChatbotSubmit();
+  }
+};
+
+window.clearChatbotHistory = function() {
+  STATE.chatHistory = [
+    {
+      sender: 'assistant',
+      text: "Chat reset. 🌱 How else can I assist you with your startup journey?",
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }
+  ];
+  saveStateToLocalStorage();
+  renderChatbotMessages();
+  showToast('Chat history cleared.');
+};
+
+function generateAIResponse(query) {
+  const q = query.toLowerCase();
+
+  if (q.includes('price') || q.includes('cost') || q.includes('profit') || q.includes('calculat')) {
+    return "💡 **Pricing Strategy Tip:** To set your selling price, use our formula: `Selling Price = (Raw Materials + Labor Hours × Hourly Rate + Overhead) ÷ (1 - Profit Margin %)`. Visit our **My Roadmap** tab (Phase 4) to use our live interactive pricing sliders!";
+  } else if (q.includes('license') || q.includes('permit') || q.includes('legal') || q.includes('bakery') || q.includes('food')) {
+    return "📜 **Legal & Permit Guide:** For home bakeries or food services, complete basic food safety handling training and apply for home kitchen health inspection. For repair or tailoring shops, register a micro-enterprise sole proprietorship license to operate legally.";
+  } else if (q.includes('client') || q.includes('customer') || q.includes('marketing') || q.includes('sell')) {
+    return "📣 **Getting First 10 Customers:** Start locally! 1) Set up a professional WhatsApp Business catalog. 2) Offer a 10% neighborhood launch discount. 3) Ask early customers for photo reviews to post on Instagram or local community groups.";
+  } else if (q.includes('tool') || q.includes('spare') || q.includes('repair') || q.includes('sourc')) {
+    return "🔧 **Tool & Parts Sourcing:** Research wholesale electronics component suppliers online or visit regional wholesale tool hubs. Always buy ESD safety mats and high-precision screwdrivers for mobile repair.";
+  } else if (q.includes('budget') || q.includes('money') || q.includes('capital')) {
+    return "💰 **Low Capital Startups:** Most micro-businesses on EntreSkill Hub require under $150–$300 to start. You can use our **Find Your Idea** assessor wizard to filter business concepts based on your budget limit!";
+  } else if (q.includes('mentor') || q.includes('session') || q.includes('help')) {
+    return "🤝 **Mentorship Access:** You can book 1-on-1 advice sessions with verified industry mentors or post your business questions directly to our Public Advisory Q&A board under the **Mentorship** tab!";
+  } else if (q.includes('tailor') || q.includes('sew')) {
+    return "✂️ **Tailoring Startup:** Custom alterations have high profit margins. Focus first on basic hem repairs, zipper replacements, and local dressmaking before taking bulk wedding attire orders!";
+  } else {
+    return "🌱 Great question! On EntreSkill Hub, you can take our **Skill Assessor** to discover matched business templates, follow structured 5-phase roadmaps, calculate prices, or book sessions with experienced mentors under the **Mentorship** tab.";
+  }
+}
