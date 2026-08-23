@@ -1381,30 +1381,48 @@ function renderAuthModalMarkup(modalEl) {
   modalEl.innerHTML = `
     <div class="auth-card">
       <button class="auth-close" onclick="closeAuthModal()">×</button>
-      <h2 style="font-size:2rem; margin-bottom:1.5rem; text-align:center; background: linear-gradient(135deg, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+      <h2 style="font-size:1.8rem; margin-bottom:1.25rem; text-align:center; background: linear-gradient(135deg, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
         ${isSignUpMode ? 'Register Account' : 'Sign In'}
       </h2>
       
-      ${isSignUpMode ? `
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="auth-name" placeholder="John Doe">
+      <!-- Quick Demo Role Switcher -->
+      <div style="margin-bottom: 1.25rem; padding: 0.75rem; background: rgba(30, 41, 59, 0.6); border-radius: 12px; border: 1px solid var(--border-color);">
+        <div style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.5rem; text-align:center; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">⚡ Quick 1-Click Demo Login</div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:0.4rem;">
+          <button type="button" class="btn btn-secondary" onclick="quickLogin('user', 'Shivam (User)', 'shivam@entreskill.org')" style="font-size:0.75rem; padding:0.4rem 0.2rem; min-height:34px;">
+            👤 User
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="quickLogin('mentor', 'Sarah (Mentor)', 'mentor@entreskill.org')" style="font-size:0.75rem; padding:0.4rem 0.2rem; min-height:34px;">
+            👨‍🏫 Mentor
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="quickLogin('admin', 'Admin Manager', 'admin@entreskill.org')" style="font-size:0.75rem; padding:0.4rem 0.2rem; min-height:34px; color:var(--accent);">
+            🛡️ Admin
+          </button>
         </div>
-      ` : ''}
-      
-      <div class="form-group">
-        <label>Email Address</label>
-        <input type="email" id="auth-email" placeholder="email@domain.com">
       </div>
       
-      <div class="form-group">
-        <label>Password</label>
+      <div style="text-align:center; color:var(--text-muted); font-size:0.8rem; margin-bottom:1rem; position:relative;">
+        <span style="background:var(--bg-main); padding:0 0.5rem; position:relative; z-index:1;">Or enter account details</span>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.85rem;">
+        <label style="font-size:0.82rem;">Full Name</label>
+        <input type="text" id="auth-name" placeholder="Enter your full name (e.g. Shivam Singh)">
+      </div>
+      
+      <div class="form-group" style="margin-bottom:0.85rem;">
+        <label style="font-size:0.82rem;">Email Address</label>
+        <input type="email" id="auth-email" placeholder="user@example.com">
+      </div>
+      
+      <div class="form-group" style="margin-bottom:0.85rem;">
+        <label style="font-size:0.82rem;">Password</label>
         <input type="password" id="auth-pass" placeholder="••••••••">
       </div>
       
       ${isSignUpMode ? `
-        <div class="form-group">
-          <label>Select Role</label>
+        <div class="form-group" style="margin-bottom:0.85rem;">
+          <label style="font-size:0.82rem;">Select Role</label>
           <select id="auth-role">
             <option value="user">Aspiring Entrepreneur</option>
             <option value="mentor">Volunteer Mentor</option>
@@ -1413,11 +1431,11 @@ function renderAuthModalMarkup(modalEl) {
         </div>
       ` : ''}
       
-      <button class="btn btn-primary" onclick="submitAuth()" style="width:100%; margin-top:1.5rem; font-size:1.05rem;">
-        ${isSignUpMode ? 'Sign Up' : 'Sign In'}
+      <button class="btn btn-primary" onclick="submitAuth()" style="width:100%; margin-top:1.25rem; font-size:1rem; min-height:42px;">
+        ${isSignUpMode ? 'Sign Up & Continue' : 'Sign In to Account'}
       </button>
       
-      <p style="text-align:center; font-size:0.85rem; color:var(--text-muted); margin-top:1.5rem;">
+      <p style="text-align:center; font-size:0.85rem; color:var(--text-muted); margin-top:1.25rem;">
         ${isSignUpMode ? 'Already have an account?' : 'New to the platform?'}
         <span style="color:var(--primary); cursor:pointer; font-weight:600;" onclick="toggleAuthMode()">
           ${isSignUpMode ? 'Sign In' : 'Register Here'}
@@ -1427,52 +1445,53 @@ function renderAuthModalMarkup(modalEl) {
   `;
 }
 
+window.quickLogin = function(role, name, email) {
+  STATE.currentUser = {
+    name: name,
+    email: email,
+    role: role
+  };
+  saveStateToLocalStorage();
+  closeAuthModal();
+  showToast(`Signed in successfully as ${name}!`);
+  renderApp();
+};
+
 window.submitAuth = function() {
+  const nameInput = document.getElementById('auth-name') ? document.getElementById('auth-name').value.trim() : '';
   const email = document.getElementById('auth-email').value.trim();
   const pass = document.getElementById('auth-pass').value.trim();
   
-  if (!email || !pass) {
-    showToast('Please fill out all fields.');
+  if (!email) {
+    showToast('Please enter an email address.');
     return;
   }
   
-  if (isSignUpMode) {
-    const name = document.getElementById('auth-name').value.trim();
-    const role = document.getElementById('auth-role').value;
-    
-    if (!name) {
-      showToast('Please enter your full name.');
-      return;
-    }
-    
-    STATE.currentUser = {
-      name: name,
-      email: email,
-      role: role
-    };
-    showToast(`Welcome ${name}! Registered as ${role}.`);
-  } else {
-    // Basic mock authentication login
-    let mockRole = 'user';
-    let mockName = email.split('@')[0];
-    
-    // Assign specific roles for testing ease
-    if (email.includes('admin')) {
-      mockRole = 'admin';
-      mockName = 'Admin Manager';
-    } else if (email.includes('mentor')) {
-      mockRole = 'mentor';
-      mockName = 'Verified Mentor';
-    }
-    
-    STATE.currentUser = {
-      name: mockName,
-      email: email,
-      role: mockRole
-    };
-    showToast(`Signed in successfully as ${mockRole}!`);
+  let role = isSignUpMode ? (document.getElementById('auth-role')?.value || 'user') : 'user';
+  let userName = nameInput;
+
+  // Infer role & default name if not manually specified
+  if (email.includes('admin')) {
+    role = 'admin';
+    if (!userName) userName = 'Admin Manager';
+  } else if (email.includes('mentor')) {
+    role = 'mentor';
+    if (!userName) userName = 'Verified Mentor';
   }
+
+  if (!userName) {
+    userName = email.split('@')[0];
+    // Capitalize first letter
+    userName = userName.charAt(0).toUpperCase() + userName.slice(1);
+  }
+
+  STATE.currentUser = {
+    name: userName,
+    email: email,
+    role: role
+  };
   
+  showToast(`Welcome ${userName}! Signed in as ${role}.`);
   saveStateToLocalStorage();
   closeAuthModal();
   renderApp();
