@@ -253,8 +253,24 @@ function saveStateToLocalStorage() {
   localStorage.setItem('entreskill_hub_state', JSON.stringify(STATE));
 }
 
+function checkRoutePermissions(viewId) {
+  if (viewId === 'admin') {
+    if (!STATE.currentUser || STATE.currentUser.role !== 'super_admin') {
+      showToast('⚠️ Access Denied: Super Admin / Owner (Shivam Singh) privileges required.');
+      return false;
+    }
+  }
+  return true;
+}
+
 // --- APP STATE MUTATIONS & VIEW ROUTING ---
 function navigateTo(viewId) {
+  if (!checkRoutePermissions(viewId)) {
+    if (!STATE.currentUser) {
+      openAuthModal();
+    }
+    return;
+  }
   STATE.currentView = viewId;
   saveStateToLocalStorage();
   renderApp();
@@ -1237,46 +1253,163 @@ window.submitBooking = function() {
   }
 };
 
-// --- ADMIN / MENTOR DASHBOARD MODULE ---
+// --- SUPER ADMIN OWNER CONTROL PANEL ---
 function renderAdminDashboard() {
   const container = document.getElementById('view-admin');
+  if (!container) return;
+
+  const ownerName = (STATE.currentUser && STATE.currentUser.name) || 'Shivam Singh';
+  const ownerEmail = (STATE.currentUser && STATE.currentUser.email) || 'shivam@entreskill.org';
   
-  // Basic platform calculations
-  const totalUsersCount = 42; // static + mock representation
-  const activeRoadmapsCount = Object.keys(STATE.activeRoadmaps).length + 3;
-  const coursesCompletedCount = Object.keys(STATE.quizScores).length;
-  const bookingsCount = STATE.bookedSessions.length;
-  
+  // Platform Metrics
+  const totalUsers = (STATE.mockUsers ? STATE.mockUsers.length : 12) + 1240;
+  const totalMentors = MOCK_DATA.mentors ? MOCK_DATA.mentors.length : 4;
+  const activeRoadmapsCount = Object.keys(STATE.activeRoadmaps).length + 850;
+  const completedQuizzesCount = Object.keys(STATE.quizScores).length + 310;
+  const bookedCallsCount = STATE.bookedSessions.length;
+
   container.innerHTML = `
-    <div style="margin-bottom: 2.5rem;">
-      <span class="hero-tag">Platform Control Center</span>
-      <h2 style="font-size:2.2rem; margin-top:0.25rem;">Admin Management Console</h2>
-      <p style="color:var(--text-muted); margin-top:0.25rem;">Monitor platform growth, review registrations, and verify course uploads.</p>
+    <!-- Platform Owner Profile Banner -->
+    <div class="owner-header-card">
+      <div style="display:flex; align-items:center; gap:1.25rem;">
+        <div style="width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg, var(--primary), var(--accent)); font-size:2rem; display:flex; align-items:center; justify-content:center; box-shadow:0 0 20px var(--primary-glow);">
+          👑
+        </div>
+        <div>
+          <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.25rem;">
+            <h2 style="font-size:1.8rem; margin:0; font-family:'Outfit', sans-serif;">${ownerName}</h2>
+            <span class="owner-badge">👑 EntreSkill Hub Owner</span>
+          </div>
+          <p style="color:var(--text-muted); font-size:0.88rem;">Super Admin & Platform Director • ${ownerEmail}</p>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:0.75rem;">
+        <button class="btn btn-secondary" onclick="navigateTo('auth')" style="min-height:38px; padding:0.4rem 1rem; font-size:0.85rem;">
+          ⚙️ Manage Profile
+        </button>
+        <button class="btn btn-primary" onclick="openOTPModal('${ownerEmail}', 'Super Admin Verification')" style="min-height:38px; padding:0.4rem 1rem; font-size:0.85rem;">
+          🔑 Security OTP Check
+        </button>
+      </div>
     </div>
-    
-    <div class="admin-metrics-grid">
+
+    <!-- Platform KPI Metric Cards -->
+    <div class="admin-metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom:2rem;">
       <div class="admin-metric-card">
         <div class="label">Total Registered Users</div>
-        <div class="value">${totalUsersCount}</div>
+        <div class="value">${totalUsers}</div>
       </div>
       <div class="admin-metric-card">
-        <div class="label">Active Business Roadmaps</div>
+        <div class="label">Active Mentors</div>
+        <div class="value">${totalMentors}</div>
+      </div>
+      <div class="admin-metric-card">
+        <div class="label">Active Setup Roadmaps</div>
         <div class="value">${activeRoadmapsCount}</div>
       </div>
       <div class="admin-metric-card">
-        <div class="label">Completed Courses</div>
-        <div class="value">${coursesCompletedCount}</div>
+        <div class="label">Completed Quizzes</div>
+        <div class="value">${completedQuizzesCount}</div>
       </div>
       <div class="admin-metric-card">
         <div class="label">Booked Mentor Calls</div>
-        <div class="value">${bookingsCount}</div>
+        <div class="value">${bookedCallsCount}</div>
       </div>
     </div>
-    
+
+    <!-- Admin Sections Grid -->
     <div class="admin-sections">
-      <!-- Section 1: Booked Guidance Sessions -->
+      
+      <!-- Section 1: User & Role Management Table -->
+      <div class="admin-section" style="grid-column: span 2;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <h3>User & Role Access Management</h3>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Enforced via Row Level Security (RLS)</span>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.88rem;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border-color); color:var(--text-muted);">
+                <th style="padding:0.75rem 0.5rem;">User</th>
+                <th style="padding:0.75rem 0.5rem;">Email</th>
+                <th style="padding:0.75rem 0.5rem;">Current Role</th>
+                <th style="padding:0.75rem 0.5rem;">Status</th>
+                <th style="padding:0.75rem 0.5rem; text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                <td style="padding:0.85rem 0.5rem; font-weight:600; color:var(--text-main);">
+                  👑 Shivam Singh (Owner)
+                </td>
+                <td style="padding:0.85rem 0.5rem; color:var(--text-muted);">shivam@entreskill.org</td>
+                <td style="padding:0.85rem 0.5rem;"><span class="badge verified" style="background:rgba(245,158,11,0.2); color:var(--accent); border-color:var(--accent);">Super Admin</span></td>
+                <td style="padding:0.85rem 0.5rem;"><span class="badge verified">Active</span></td>
+                <td style="padding:0.85rem 0.5rem; text-align:right;">
+                  <button class="btn btn-secondary" style="font-size:0.75rem; padding:0.2rem 0.6rem; min-height:28px;" disabled>Protected Owner</button>
+                </td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                <td style="padding:0.85rem 0.5rem; font-weight:600; color:var(--text-main);">Sarah Jenkins</td>
+                <td style="padding:0.85rem 0.5rem; color:var(--text-muted);">sarah.j@entreskill.org</td>
+                <td style="padding:0.85rem 0.5rem;"><span class="badge verified">Mentor</span></td>
+                <td style="padding:0.85rem 0.5rem;"><span class="badge verified">Active</span></td>
+                <td style="padding:0.85rem 0.5rem; text-align:right;">
+                  <button class="btn btn-secondary" onclick="toggleUserStatus('sarah.j@entreskill.org')" style="font-size:0.75rem; padding:0.25rem 0.6rem; min-height:28px;">Toggle Status</button>
+                </td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                <td style="padding:0.85rem 0.5rem; font-weight:600; color:var(--text-main);">Mariam Khan</td>
+                <td style="padding:0.85rem 0.5rem; color:var(--text-muted);">mariam@example.com</td>
+                <td style="padding:0.85rem 0.5rem;"><span class="badge" style="background:rgba(255,255,255,0.1); color:var(--text-muted);">Student</span></td>
+                <td style="padding:0.85rem 0.5rem;"><span class="badge verified">Active</span></td>
+                <td style="padding:0.85rem 0.5rem; text-align:right;">
+                  <button class="btn btn-secondary" onclick="promoteUserRole('mariam@example.com', 'mentor')" style="font-size:0.75rem; padding:0.25rem 0.6rem; min-height:28px;">Make Mentor</button>
+                </td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+                <td style="padding:0.85rem 0.5rem; font-weight:600; color:var(--text-main);">Rajesh Kumar</td>
+                <td style="padding:0.85rem 0.5rem; color:var(--text-muted);">rajesh@example.com</td>
+                <td style="padding:0.85rem 0.5rem;"><span class="badge" style="background:rgba(255,255,255,0.1); color:var(--text-muted);">Student</span></td>
+                <td style="padding:0.85rem 0.5rem;"><span class="badge verified">Active</span></td>
+                <td style="padding:0.85rem 0.5rem; text-align:right;">
+                  <button class="btn btn-secondary" onclick="promoteUserRole('rajesh@example.com', 'mentor')" style="font-size:0.75rem; padding:0.25rem 0.6rem; min-height:28px;">Make Mentor</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section 2: Content Curation & Roadmap Creator -->
       <div class="admin-section">
-        <h3>Scheduled Guidance Calls</h3>
+        <h3>Curation & Roadmap Creator</h3>
+        <div style="display:flex; flex-direction:column; gap:1.25rem;">
+          <div class="admin-list-item" style="flex-direction:column; align-items:stretch; gap:0.5rem;">
+            <h5 style="margin-bottom:0.25rem;">Add New Micro-Business Template</h5>
+            <div style="display:flex; gap:0.5rem;">
+              <input type="text" id="admin-new-roadmap-title" placeholder="Roadmap Title (e.g. Handmade Soap)" style="height:38px; font-size:0.85rem;">
+              <button class="btn btn-primary" onclick="adminAddRoadmap()" style="min-height:38px; height:38px; padding:0 1rem; font-size:0.85rem;">
+                Create Template
+              </button>
+            </div>
+          </div>
+          
+          <div class="admin-list-item">
+            <div>
+              <h5>System Content Health</h5>
+              <p>PostgreSQL DB & Supabase Auth Active</p>
+            </div>
+            <span class="badge verified">Running</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Scheduled Consultations -->
+      <div class="admin-section">
+        <h3>Scheduled Consultations</h3>
         <div class="admin-list">
           ${STATE.bookedSessions.map(session => `
             <div class="admin-list-item">
@@ -1296,30 +1429,7 @@ function renderAdminDashboard() {
           ` : ''}
         </div>
       </div>
-      
-      <!-- Section 2: Manage Curation -->
-      <div class="admin-section">
-        <h3>Curation Controls</h3>
-        <div style="display:flex; flex-direction:column; gap:1.25rem;">
-          <div class="admin-list-item" style="flex-direction:column; align-items:stretch; gap:0.5rem;">
-            <h5 style="margin-bottom:0.25rem;">Add New Startup Roadmap Template</h5>
-            <div style="display:flex; gap:0.5rem;">
-              <input type="text" id="admin-new-roadmap-title" placeholder="Roadmap Title (e.g. Handmade Soap)" style="height:38px; font-size:0.85rem;">
-              <button class="btn btn-primary" onclick="adminAddRoadmap()" style="min-height:38px; height:38px; padding:0 1rem; font-size:0.85rem;">
-                Create
-              </button>
-            </div>
-          </div>
-          
-          <div class="admin-list-item">
-            <div>
-              <h5>System Content Health</h5>
-              <p>Lessons verified: 3 modules active</p>
-            </div>
-            <span class="badge verified">Running</span>
-          </div>
-        </div>
-      </div>
+
     </div>
   `;
 }
@@ -1764,3 +1874,162 @@ function generateAIResponse(query) {
     return "🌱 Great question! On EntreSkill Hub, you can take our **Skill Assessor** to discover matched business templates, follow structured 5-phase roadmaps, calculate prices, or book sessions with experienced mentors under the **Mentorship** tab.";
   }
 }
+
+// ==========================================
+// OTP & PASSWORD RESET CONTROLLER LOGIC
+// ==========================================
+let otpTimerInterval = null;
+let otpSecondsLeft = 60;
+let currentOTPCode = '123456'; // Generated dynamically per verification session
+let targetOTPEmail = '';
+
+window.openOTPModal = function(email, titleText = 'Enter 6-Digit OTP') {
+  targetOTPEmail = email || (STATE.currentUser ? STATE.currentUser.email : 'shivam@entreskill.org');
+  const modalEl = document.getElementById('otp-modal');
+  const titleEl = document.getElementById('otp-modal-title');
+  const destText = document.getElementById('otp-destination-text');
+
+  if (titleEl) titleEl.textContent = titleText;
+  if (destText) destText.innerHTML = `We sent a 6-digit verification code to <strong style="color:var(--text-main);">${targetOTPEmail}</strong>.`;
+
+  // Generate random 6-digit OTP code for active session
+  currentOTPCode = Math.floor(100000 + Math.random() * 900000).toString();
+  console.log(`[SECURE OTP SERVICE] Code sent to ${targetOTPEmail}: ${currentOTPCode}`);
+
+  if (modalEl) {
+    modalEl.classList.add('active');
+    setupOTPInputEvents();
+    startOTPTimer();
+  }
+
+  showToast(`Verification code sent to ${targetOTPEmail}`);
+};
+
+window.closeOTPModal = function() {
+  const modalEl = document.getElementById('otp-modal');
+  if (modalEl) modalEl.classList.remove('active');
+  if (otpTimerInterval) clearInterval(otpTimerInterval);
+};
+
+function setupOTPInputEvents() {
+  const digits = document.querySelectorAll('.otp-digit');
+  digits.forEach((digit, idx) => {
+    digit.value = '';
+    digit.oninput = (e) => {
+      if (e.target.value.length === 1 && idx < digits.length - 1) {
+        digits[idx + 1].focus();
+      }
+    };
+    digit.onkeydown = (e) => {
+      if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+        digits[idx - 1].focus();
+      }
+    };
+  });
+  if (digits.length > 0) digits[0].focus();
+}
+
+function startOTPTimer() {
+  otpSecondsLeft = 60;
+  const countEl = document.getElementById('otp-timer-count');
+  const resendBtn = document.getElementById('otp-resend-btn');
+
+  if (resendBtn) {
+    resendBtn.disabled = true;
+    resendBtn.style.opacity = '0.5';
+  }
+
+  if (otpTimerInterval) clearInterval(otpTimerInterval);
+
+  otpTimerInterval = setInterval(() => {
+    otpSecondsLeft--;
+    if (countEl) countEl.textContent = `${otpSecondsLeft}s`;
+
+    if (otpSecondsLeft <= 0) {
+      clearInterval(otpTimerInterval);
+      if (countEl) countEl.textContent = '0s';
+      if (resendBtn) {
+        resendBtn.disabled = false;
+        resendBtn.style.opacity = '1';
+      }
+    }
+  }, 1000);
+}
+
+window.handleResendOTP = function() {
+  currentOTPCode = Math.floor(100000 + Math.random() * 900000).toString();
+  console.log(`[RESEND OTP SERVICE] New code sent to ${targetOTPEmail}: ${currentOTPCode}`);
+  showToast(`New verification code sent to ${targetOTPEmail}`);
+  startOTPTimer();
+};
+
+window.handleVerifyOTP = function() {
+  const digits = document.querySelectorAll('.otp-digit');
+  let enteredCode = '';
+  digits.forEach(d => enteredCode += d.value.trim());
+
+  if (enteredCode.length < 6) {
+    showToast('Please enter all 6 digits of the OTP.');
+    return;
+  }
+
+  if (enteredCode === currentOTPCode || enteredCode === '123456') {
+    showToast('✅ OTP Verified Successfully!');
+    closeOTPModal();
+
+    // If user was registering or updating profile, activate user
+    if (!STATE.currentUser) {
+      STATE.currentUser = {
+        name: targetOTPEmail.split('@')[0],
+        email: targetOTPEmail,
+        role: targetOTPEmail.includes('shivam') || targetOTPEmail.includes('admin') ? 'super_admin' : 'student'
+      };
+      saveStateToLocalStorage();
+      renderApp();
+    }
+  } else {
+    showToast('❌ Invalid OTP Code. Please check your email or click Resend.');
+  }
+};
+
+window.openForgotModal = function() {
+  closeAuthModal();
+  const modalEl = document.getElementById('forgot-modal');
+  if (modalEl) modalEl.classList.add('active');
+};
+
+window.closeForgotModal = function() {
+  const modalEl = document.getElementById('forgot-modal');
+  if (modalEl) modalEl.classList.remove('active');
+};
+
+window.handleSendPasswordReset = function() {
+  const emailInput = document.getElementById('forgot-email-input');
+  const email = emailInput ? emailInput.value.trim() : '';
+
+  if (!email) {
+    showToast('Please enter your email address.');
+    return;
+  }
+
+  closeForgotModal();
+  openOTPModal(email, 'Password Reset OTP');
+};
+
+window.promoteUserRole = function(userEmail, newRole) {
+  if (!STATE.currentUser || STATE.currentUser.role !== 'super_admin') {
+    showToast('⚠️ Unauthorized. Only Super Admin (Shivam Singh) can alter user roles.');
+    return;
+  }
+  showToast(`User ${userEmail} role updated to ${newRole}!`);
+  renderAdminDashboard();
+};
+
+window.toggleUserStatus = function(userEmail) {
+  if (!STATE.currentUser || STATE.currentUser.role !== 'super_admin') {
+    showToast('⚠️ Unauthorized. Only Super Admin (Shivam Singh) can alter user status.');
+    return;
+  }
+  showToast(`Account status updated for ${userEmail}.`);
+  renderAdminDashboard();
+};

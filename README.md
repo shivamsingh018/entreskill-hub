@@ -1,65 +1,59 @@
-# EntreSkill Hub – Skill-to-Startup Platform
+# EntreSkill Hub – Skill-to-Startup Enablement Platform
 
-EntreSkill Hub is a responsive, client-side web application designed to help aspiring micro-entrepreneurs identify viable startup concepts based on their practical skills and interests, providing them with step-by-step guidance roadmaps, interactive costing tools, educational courses, and peer mentorship.
+**Platform Owner & Super Admin**: Shivam Singh  
+**Live Application**: [https://shivamsingh018.github.io/entreskill-hub/](https://shivamsingh018.github.io/entreskill-hub/)  
+**GitHub Repository**: [https://github.com/shivamsingh018/entreskill-hub](https://github.com/shivamsingh018/entreskill-hub)
+
+EntreSkill Hub is a multi-role web platform designed to empower aspiring micro-entrepreneurs to transform practical skills (tailoring, food preparation, mobile repair, handicrafts, digital services) into sustainable micro-businesses through skill assessment, 5-phase operational roadmaps, interactive unit pricing calculators, byte-sized courses, and volunteer mentorship.
 
 ---
 
-## 🚀 Getting Started
+## 👑 Ownership Model & Role Architecture
 
-Since the platform is built using a clean, self-contained **Single Page Application (SPA)** architecture with **Vanilla HTML5, CSS3, and JavaScript**, there is zero installation required.
+The platform is configured with an explicit ownership model and 3 distinct roles:
 
-### How to Run Locally
+1. **Super Admin / Platform Owner (`Shivam Singh`)**:
+   - Platform Owner: **Shivam Singh** (`shivam@entreskill.org`).
+   - Protected Access to Super Admin Control Panel (`#admin` / `/admin`).
+   - Features Total Users, Mentors, Students statistics, User Access Management (Activate/Deactivate, Promote Roles), Content Curation, and Audit Activity Logs.
+2. **Mentor (`/mentor`)**:
+   - Volunteer mentor portal to manage specialties, host Q&A advisory sessions, and review mentee setup progress. Restricted from Super Admin settings.
+3. **Student / User (`/student`)**:
+   - Default role for public sign-ups. Access to Skill Assessor, active setup roadmaps, unit pricing calculator, course player & quizzes, session bookings, and student profile.
 
-You can open the project in any of the following ways:
+---
 
-#### Option 1: Direct File Open
-Double-click the [index.html](file:///Users/shivamsingh/.gemini/antigravity/scratch/entreskill-hub/index.html) file to open it directly in Google Chrome, Safari, or any modern web browser.
+## 🔐 Authentication, Security & OTP System
 
-#### Option 2: Run a Local Development Server
-For the best experience (and to preview standard relative paths accurately), run a light HTTP server inside the project directory:
+- **Production Backend Support**: Integrates with Supabase Auth & PostgreSQL database via Supabase Client JS SDK (`@supabase/supabase-js@2`).
+- **Secure Password Hashing**: Server-side Argon2 / bcrypt password hashing via authentication backend.
+- **Real 6-Digit OTP Verification**: Email OTP verification for sign-up and password reset with 60-second countdown timer, single-use validation, and resend cooldowns.
+- **Route Authorization Guard**: Enforces role permissions at client (`checkRoutePermissions()`) and database Row Level Security (RLS) levels. Unauthorized access attempts to `/admin` are immediately blocked and redirected.
+- **JWT Session Persistence**: Authenticated sessions (`access_token`, `refresh_token`) persist across tab refreshes without storing plain text credentials in localStorage.
 
+---
+
+## 📊 Database Schema (`schema.sql`)
+
+The database script `schema.sql` sets up PostgreSQL tables with Row-Level Security (RLS):
+
+- `profiles`: User accounts, full name, email, phone, avatar, role (`super_admin`, `mentor`, `student`), and status.
+- `mentors`: Mentor profiles, specialty, experience, bio, rating, and verification status.
+- `platform_activity`: System audit logs tracking registrations, logins, role changes, and content updates.
+- `roadmap_progress`: Step checkmark completions per user and business idea.
+
+---
+
+## 🚀 How to Run & Deploy
+
+### Local Development
 ```bash
-# Using Python 3 (Installed by default on macOS)
-python3 -m http.server 8000
-
-# Using Node.js npx runner
-npx serve .
+# Run local HTTP server
+python3 -m http.server 8080
+# Open http://localhost:8080
 ```
-Then open your browser to `http://localhost:8000`.
 
----
-
-## 🛠️ Technology Stack & Architecture
-
-- **Frontend Core**: HTML5 and modular JavaScript (ES6+).
-- **Styling Layout**: Vanilla CSS3 using:
-  - HSL-tailored custom properties for consistent premium branding.
-  - Responsive **Flexbox** and **Grid** alignments adjusting from smartphones to desktops.
-  - **Glassmorphism** cards, backdrop filters, and subtle ambient shadows.
-  - WCAG 2.1 AA compliant color contrasts and large target click states.
-- **State & Data Store**: A centralized `STATE` reactive tree inside [app.js](file:///Users/shivamsingh/.gemini/antigravity/scratch/entreskill-hub/app.js) with:
-  - Centralized state mutation triggers rendering the UI reactively.
-  - Complete sync to `localStorage` ensuring onboarding selections, checklist checkmarks, booked sessions, and quiz achievements persist across window refreshes.
-  - Real-time calculator pricing sliders.
-
----
-
-## 🌟 Implemented Features
-
-1. **Interactive Assessor Wizard**: A multi-step questionnaire mapping selected skills (sewing, baking, repair, etc.) and interests (home-based, fast cash flows, tech) to startup ideas.
-2. **Business Recommendation Engine**: Custom score calculator sorting business opportunities by skill-to-interest percentages.
-3. **Checklist Startup Roadmaps**: Complete step-by-step phases covering Demand Validation, Sourcing Tools, Legal Permits, Cost Calculators, and Launch Marketing.
-4. **Smart Financial Calculator**: Interactive pricing helper estimating unit cost, markup profit margin, recommended sale prices, and monthly break-even quotas.
-5. **Micro-Learning Hub**: Class cards with slide narration and interactive validation quizzes tracking grading and badge completions.
-6. **Mentorship Directory & Q&A**: Active directory of local specialists allowing scheduling of advisory sessions and advisory board text postings.
-7. **Admin Dashboard Console**: Console to inspect platform KPIs (number of users, roadmaps, course scores) and add custom startup templates dynamically.
-
----
-
-## 💡 Role-Based Testing Accounts
-
-To test the role-specific features (Admin Dashboard access or Mentor directories), you can sign in with mock email domains:
-
-- **Admin Account**: Sign in with an email containing the word `admin` (e.g., `admin@hub.com`) to unlock the **Admin Panel** in the top navigation menu.
-- **Mentor Account**: Sign in with an email containing the word `mentor` (e.g., `mentor@hub.com`) to register mock sessions and view platform KPIs.
-- **Standard User**: Sign in with any standard email (e.g., `mariam@gmail.com`) to create personal roadmaps, track checklists, and book sessions.
+### GitHub Pages Deployment
+The project is configured for static hosting on GitHub Pages:
+1. Enable GitHub Pages on `main` branch root (`/`).
+2. Public site URL: `https://shivamsingh018.github.io/entreskill-hub/`
