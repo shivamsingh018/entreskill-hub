@@ -392,6 +392,9 @@ function renderApp() {
     case 'admin':
       renderAdminDashboard();
       break;
+    case 'auth':
+      renderAuthView();
+      break;
   }
 }
 
@@ -411,8 +414,10 @@ function updateNavigationUI() {
   if (STATE.currentUser) {
     authNavBtn.textContent = 'Sign Out';
     userIndicator.innerHTML = `
-      <span class="role-badge">${STATE.currentUser.role}</span>
-      <span style="font-weight:600; font-size:0.9rem;">${STATE.currentUser.name}</span>
+      <div onclick="navigateTo('auth')" style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;" title="Click to view Profile">
+        <span class="role-badge" style="background:rgba(16,185,129,0.2); color:var(--primary); border:1px solid var(--primary); padding:0.2rem 0.6rem; border-radius:12px; font-size:0.75rem; font-weight:600; text-transform:uppercase;">${STATE.currentUser.role}</span>
+        <span style="font-weight:600; font-size:0.9rem; color:var(--text-main);">👤 ${STATE.currentUser.name}</span>
+      </div>
     `;
     
     // Show admin link if role is admin
@@ -1357,30 +1362,88 @@ window.adminAddRoadmap = function() {
   renderAdminDashboard();
 };
 
-// --- AUTHENTICATION MODAL LOGIC ---
+// --- AUTHENTICATION & USER PROFILE LOGIC ---
 let isSignUpMode = false;
+
 window.openAuthModal = function() {
   isSignUpMode = false;
-  const modalEl = document.getElementById('auth-modal');
+  let modalEl = document.getElementById('auth-modal');
+  if (!modalEl) {
+    modalEl = document.createElement('div');
+    modalEl.id = 'auth-modal';
+    modalEl.className = 'auth-modal';
+    document.body.appendChild(modalEl);
+  }
+  
+  // Close when clicking modal backdrop outside card
+  modalEl.onclick = function(e) {
+    if (e.target === modalEl) {
+      closeAuthModal();
+    }
+  };
+
   renderAuthModalMarkup(modalEl);
   modalEl.classList.add('active');
 };
 
 window.closeAuthModal = function() {
   const modalEl = document.getElementById('auth-modal');
-  modalEl.classList.remove('active');
+  if (modalEl) {
+    modalEl.classList.remove('active');
+  }
 };
 
 window.toggleAuthMode = function() {
   isSignUpMode = !isSignUpMode;
   const modalEl = document.getElementById('auth-modal');
-  renderAuthModalMarkup(modalEl);
+  if (modalEl && modalEl.classList.contains('active')) {
+    renderAuthModalMarkup(modalEl);
+  }
+  if (STATE.currentView === 'auth') {
+    renderAuthView();
+  }
 };
 
-function renderAuthModalMarkup(modalEl) {
-  modalEl.innerHTML = `
+function renderAuthView() {
+  const container = document.getElementById('view-auth');
+  if (!container) return;
+
+  if (STATE.currentUser) {
+    container.innerHTML = `
+      <div style="max-width:600px; margin:2rem auto; padding:2rem; background:var(--bg-card); border-radius:var(--border-radius); border:1px solid var(--border-color); text-align:center;">
+        <div style="width:70px; height:70px; border-radius:50%; background:linear-gradient(135deg, var(--primary), var(--accent)); font-size:2.2rem; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; box-shadow:0 0 20px var(--primary-glow);">
+          👤
+        </div>
+        <h2 style="font-size:2.2rem; margin-bottom:0.5rem;">${STATE.currentUser.name}</h2>
+        <div style="display:inline-block; padding:0.35rem 1rem; background:rgba(16,185,129,0.15); border:1px solid var(--primary); border-radius:20px; color:var(--primary); font-weight:600; text-transform:uppercase; font-size:0.8rem; margin-bottom:1.5rem;">
+          Role: ${STATE.currentUser.role}
+        </div>
+        
+        <p style="color:var(--text-muted); margin-bottom:1.75rem;">Email: <strong>${STATE.currentUser.email}</strong></p>
+
+        <div style="display:flex; justify-content:center; gap:1rem; flex-wrap:wrap;">
+          ${STATE.currentUser.role === 'admin' ? `
+            <button class="btn btn-primary" onclick="navigateTo('admin')">Go to Admin Dashboard</button>
+          ` : `
+            <button class="btn btn-primary" onclick="navigateTo('dashboard')">View Active Roadmap</button>
+          `}
+          <button class="btn btn-secondary" onclick="handleAuthNavClick()">Sign Out</button>
+        </div>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div style="max-width:480px; margin:2rem auto;">
+        ${getAuthCardMarkupHTML()}
+      </div>
+    `;
+  }
+}
+
+function getAuthCardMarkupHTML(showCloseBtn = true) {
+  return `
     <div class="auth-card">
-      <button class="auth-close" onclick="closeAuthModal()">×</button>
+      ${showCloseBtn ? '<button class="auth-close" onclick="closeAuthModal()">×</button>' : ''}
       <h2 style="font-size:1.8rem; margin-bottom:1.25rem; text-align:center; background: linear-gradient(135deg, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
         ${isSignUpMode ? 'Register Account' : 'Sign In'}
       </h2>
@@ -1443,6 +1506,10 @@ function renderAuthModalMarkup(modalEl) {
       </p>
     </div>
   `;
+}
+
+function renderAuthModalMarkup(modalEl) {
+  modalEl.innerHTML = getAuthCardMarkupHTML(true);
 }
 
 window.quickLogin = function(role, name, email) {
