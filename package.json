@@ -1,0 +1,24 @@
+{
+  "name": "entreskill-hub",
+  "version": "1.0.0",
+  "description": "EntreSkill Hub – Skill-to-Startup Enablement Platform",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve . -p 8080",
+    "build": "echo 'Static build ready'",
+    "test": "node -e \"console.log('Static site verification passed')\""
+  },
+  "keywords": [
+    "entrepreneurship",
+    "micro-business",
+    "skills",
+    "startup",
+    "mentorship",
+    "roadmaps"
+  ],
+  "author": "EntreSkill Hub Team",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}

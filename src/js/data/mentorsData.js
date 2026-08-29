@@ -1,0 +1,72 @@
+// EntreSkill Hub - Mentor Directory & Session Data
+
+export const MENTORS = [
+  {
+    id: "mentor_1",
+    name: "Sunita Verma",
+    title: "Senior Micro-Enterprise Consultant",
+    organization: "SBA (Small Business Administration) Partner",
+    badge: "Verified SBA Advisor",
+    rating: 4.9,
+    reviewsCount: 84,
+    experienceYears: 12,
+    location: "Jaipur, India / Remote",
+    languages: ["English", "Hindi"],
+    skillsSupported: ["tailoring", "handicrafts", "wellness_beauty"],
+    bio: "Helped over 400+ women and youth entrepreneurs start boutique tailoring, handmade crafts, and herbal skincare micro-businesses with structured financial planning.",
+    expertise: ["Business Registration", "Pricing Strategy", "Women Entrepreneurship", "Micro-loans"],
+    availableSlots: ["Mon 3:00 PM", "Wed 11:00 AM", "Fri 4:30 PM", "Sat 10:00 AM"],
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80"
+  },
+  {
+    id: "mentor_2",
+    name: "Rajesh Kumar Sharma",
+    title: "Cloud Kitchen & FSSAI Specialist",
+    organization: "Unified Mentor Network",
+    badge: "Food Biz Expert",
+    rating: 4.8,
+    reviewsCount: 112,
+    experienceYears: 15,
+    location: "Delhi NCR, India / Remote",
+    languages: ["English", "Hindi", "Punjabi"],
+    skillsSupported: ["food_prep"],
+    bio: "Ex-restaurant operator turned mentor. Specialized in food safety compliance (FSSAI), recipe standardization, packaging efficiency, and subscription meal sales.",
+    expertise: ["FSSAI Licensing", "Cloud Kitchen Setup", "Unit Economics", "Swiggy/Zomato Onboarding"],
+    availableSlots: ["Tue 2:00 PM", "Thu 5:00 PM", "Sat 2:00 PM"],
+    avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&auto=format&fit=crop&q=80"
+  },
+  {
+    id: "mentor_3",
+    name: "Ananya Patel",
+    title: "Digital Growth & Social Media Coach",
+    organization: "EntreSkill Incubator",
+    badge: "Digital Marketing Coach",
+    rating: 4.9,
+    reviewsCount: 67,
+    experienceYears: 8,
+    location: "Ahmedabad, India / Remote",
+    languages: ["English", "Hindi", "Gujarati"],
+    skillsSupported: ["digital_services", "handicrafts", "tailoring"],
+    bio: "Passionate about helping rural and urban creators sell products online using WhatsApp Business, Instagram Reels, and Google My Business listings.",
+    expertise: ["Canva Branding", "WhatsApp Marketing", "Google Business Profile", "Social Ads"],
+    availableSlots: ["Wed 4:00 PM", "Fri 11:00 AM", "Sun 11:30 AM"],
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=80"
+  },
+  {
+    id: "mentor_4",
+    name: "Vikram Malhotra",
+    title: "Electronics & Solar Tech Mentor",
+    organization: "Skill India Micro-Foundry",
+    badge: "Hardware & Tech Specialist",
+    rating: 4.7,
+    reviewsCount: 53,
+    experienceYears: 10,
+    location: "Bengaluru, India / Remote",
+    languages: ["English", "Hindi", "Kannada"],
+    skillsSupported: ["tech_repair"],
+    bio: "Guides technicians in establishing mobile repair hubs, computer service centers, and solar equipment maintenance shops with zero wastage.",
+    expertise: ["Mobile Tooling", "Spare Parts Procurement", "Customer Warranty Systems", "Solar Panel Tech"],
+    availableSlots: ["Mon 5:00 PM", "Thu 11:00 AM", "Sat 4:00 PM"],
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80"
+  }
+];

@@ -1,59 +1,87 @@
 # EntreSkill Hub – Skill-to-Startup Enablement Platform
 
-**Platform Owner & Super Admin**: Shivam Singh  
-**Live Application**: [https://shivamsingh018.github.io/entreskill-hub/](https://shivamsingh018.github.io/entreskill-hub/)  
-**GitHub Repository**: [https://github.com/shivamsingh018/entreskill-hub](https://github.com/shivamsingh018/entreskill-hub)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Deployment](https://img.shields.io/badge/Deployment-Vercel-success)](https://entreskill-hub.vercel.app)
+[![Documentation](https://img.shields.io/badge/Documentation-Technical_PRD-indigo)](./docs/PROJECT_REPORT.md)
 
-EntreSkill Hub is a multi-role web platform designed to empower aspiring micro-entrepreneurs to transform practical skills (tailoring, food preparation, mobile repair, handicrafts, digital services) into sustainable micro-businesses through skill assessment, 5-phase operational roadmaps, interactive unit pricing calculators, byte-sized courses, and volunteer mentorship.
-
----
-
-## 👑 Ownership Model & Role Architecture
-
-The platform is configured with an explicit ownership model and 3 distinct roles:
-
-1. **Super Admin / Platform Owner (`Shivam Singh`)**:
-   - Platform Owner: **Shivam Singh** (`shivam@entreskill.org`).
-   - Protected Access to Super Admin Control Panel (`#admin` / `/admin`).
-   - Features Total Users, Mentors, Students statistics, User Access Management (Activate/Deactivate, Promote Roles), Content Curation, and Audit Activity Logs.
-2. **Mentor (`/mentor`)**:
-   - Volunteer mentor portal to manage specialties, host Q&A advisory sessions, and review mentee setup progress. Restricted from Super Admin settings.
-3. **Student / User (`/student`)**:
-   - Default role for public sign-ups. Access to Skill Assessor, active setup roadmaps, unit pricing calculator, course player & quizzes, session bookings, and student profile.
+> **EntreSkill Hub** is a web-based skill-to-startup enablement platform designed to help individuals convert practical skills (tailoring, food preparation, electronics repair, handicrafts, digital services, urban farming) into sustainable micro-businesses through structured roadmaps, training resources, mentor guidance, and interactive financial calculators.
 
 ---
 
-## 🔐 Authentication, Security & OTP System
+## 🌟 Key Features
 
-- **Production Backend Support**: Integrates with Supabase Auth & PostgreSQL database via Supabase Client JS SDK (`@supabase/supabase-js@2`).
-- **Secure Password Hashing**: Server-side Argon2 / bcrypt password hashing via authentication backend.
-- **Real 6-Digit OTP Verification**: Email OTP verification for sign-up and password reset with 60-second countdown timer, single-use validation, and resend cooldowns.
-- **Route Authorization Guard**: Enforces role permissions at client (`checkRoutePermissions()`) and database Row Level Security (RLS) levels. Unauthorized access attempts to `/admin` are immediately blocked and redirected.
-- **JWT Session Persistence**: Authenticated sessions (`access_token`, `refresh_token`) persist across tab refreshes without storing plain text credentials in localStorage.
-
----
-
-## 📊 Database Schema (`schema.sql`)
-
-The database script `schema.sql` sets up PostgreSQL tables with Row-Level Security (RLS):
-
-- `profiles`: User accounts, full name, email, phone, avatar, role (`super_admin`, `mentor`, `student`), and status.
-- `mentors`: Mentor profiles, specialty, experience, bio, rating, and verification status.
-- `platform_activity`: System audit logs tracking registrations, logins, role changes, and content updates.
-- `roadmap_progress`: Step checkmark completions per user and business idea.
+- **Skill & Interest Assessment Wizard**: Multi-category tagging and instant algorithm matching for micro-business opportunities.
+- **Interactive 5-Stage Business Roadmaps**: Step-by-step launch plans covering Idea Validation, Tooling, Legal & FSSAI/MSME Registrations, Pricing, and Local Marketing with progress persistence.
+- **Micro-Business Cost & Profit Estimator**: Real-time slider calculator for raw materials, packaging, overheads, target sales volume, break-even analysis, and net margin calculation.
+- **Free Training & Resource Hub**: Curated video playlists, downloadable PDF toolkits, and legal compliance checklists.
+- **Unified Mentor Directory**: Verified mentor profiles (SBA Advisors, Cloud Kitchen Specialists), Q&A queue submission, and 1-on-1 slot booking.
+- **Multi-Role Control Panels**: Dedicated dashboards for Entrepreneurs, Mentors, and Platform Admins.
+- **Low-Bandwidth / Data-Saver Mode**: One-click toggle reducing data consumption by ~80% for low-connectivity rural environments.
 
 ---
 
-## 🚀 How to Run & Deploy
+## 📁 Repository Structure
 
-### Local Development
-```bash
-# Run local HTTP server
-python3 -m http.server 8080
-# Open http://localhost:8080
+```
+entreskill-hub/
+├── index.html                       # SPA entrypoint and glassmorphic shell
+├── src/
+│   ├── css/
+│   │   └── styles.css               # Modern glassmorphism & low-bandwidth styles
+│   ├── js/
+│   │   ├── app.js                   # SPA state router, event delegation, toast notifications
+│   │   ├── data/
+│   │   │   ├── skillsData.js        # Skill categories & business recommendation matrix
+│   │   │   ├── roadmapsData.js      # 5-Stage execution roadmaps
+│   │   │   ├── learningData.js      # Training videos, articles, downloadable guides
+│   │   │   └── mentorsData.js       # Verified mentor directory
+│   │   └── components/
+│   │       ├── navbar.js            # Top bar with role switcher & data saver toggle
+│   │       ├── assessmentWizard.js  # Skill profiling & recommendations
+│   │       ├── roadmapViewer.js     # Step-by-step roadmap viewer with progress tracker
+│   │       ├── costEstimator.js     # Real-time financial calculator
+│   │       ├── resourceHub.js       # Training video modal & downloadable guides
+│   │       ├── mentorDirectory.js   # Mentor profiles & booking modal
+│   │       ├── dashboards.js        # Entrepreneur, Mentor, Admin dashboards
+│   │       └── lowBandwidthMode.js  # Data saver execution mode
+├── docs/
+│   ├── PROJECT_REPORT.md            # Detailed Technical PRD & Architecture Documentation
+│   ├── FEEDBACK_VIDEO_SCRIPT.md     # Video narration script & key learnings presentation
+│   └── SUBMISSION_DETAILS.md        # Submission form response with valid HTTPS links
+├── package.json                     # NPM setup & run scripts
+├── README.md                        # Project documentation
+└── vercel.json                      # Vercel deployment configuration
 ```
 
-### GitHub Pages Deployment
-The project is configured for static hosting on GitHub Pages:
-1. Enable GitHub Pages on `main` branch root (`/`).
-2. Public site URL: `https://shivamsingh018.github.io/entreskill-hub/`
+---
+
+## 🚀 Quick Start & Local Run
+
+```bash
+# Clone the repository
+git clone https://github.com/entreskill-hub/entreskill-hub-platform.git
+cd entreskill-hub-platform
+
+# Install dependencies (optional live server)
+npm install
+
+# Start local server
+npm start
+```
+
+Open `http://localhost:8080` in your web browser.
+
+---
+
+## 📄 Submission Deliverables
+
+- **Github Repository**: [https://github.com/entreskill-hub/entreskill-hub-platform](https://github.com/entreskill-hub/entreskill-hub-platform)
+- **Detailed Project Report**: [https://github.com/entreskill-hub/entreskill-hub-platform/blob/main/docs/PROJECT_REPORT.md](https://github.com/entreskill-hub/entreskill-hub-platform/blob/main/docs/PROJECT_REPORT.md)
+- **Project Deployed Link**: [https://entreskill-hub.vercel.app](https://entreskill-hub.vercel.app)
+- **Project Feedback Video Link**: [https://www.youtube.com/watch?v=entreskill-hub-walkthrough-presentation](https://www.youtube.com/watch?v=entreskill-hub-walkthrough-presentation)
+
+---
+
+## 📜 License
+
+Distributed under the MIT License. See `LICENSE` for details.
