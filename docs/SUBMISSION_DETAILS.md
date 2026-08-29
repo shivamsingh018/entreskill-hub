@@ -1,49 +1,45 @@
 # Project Submission Form Details
 ## EntreSkill Hub – Skill-to-Startup Enablement Platform
 
-All required submission links are provided below in accordance with the project submission guidelines. Each link starts with `https://` as mandated.
+All required submission links are provided below using your GitHub username **shivamsingh018** in accordance with the project submission guidelines.
 
 ---
 
 ### 1. Github Repository Link *
-`https://github.com/entreskill-hub/entreskill-hub-platform`
+`https://github.com/shivamsingh018/entreskill-hub`
 
 ---
 
 ### 2. Detailed Project Report Link *
-`https://github.com/entreskill-hub/entreskill-hub-platform/blob/main/docs/PROJECT_REPORT.md`
+`https://github.com/shivamsingh018/entreskill-hub/blob/main/docs/PROJECT_REPORT.md`
 
 ---
 
 ### 3. Project Deployed Link *
-`https://entreskill-hub.vercel.app`
+`https://shivamsingh018.github.io/entreskill-hub`
 
 ---
 
-### 4. Project Feedback Video Link *
+### 4. Project Feedback video link *
 `https://www.youtube.com/watch?v=entreskill-hub-walkthrough-presentation`
 
 ---
 
 ## Deliverables Summary Matrix
 
-| Deliverable Field | URL Location | Content Description |
+| Deliverable Field | Submission URL | Content Description |
 | :--- | :--- | :--- |
-| **Github Repository** | `https://github.com/entreskill-hub/entreskill-hub-platform` | Complete source code, modular JS components, Tailwind CSS styling, Vercel configuration, and test scripts. |
-| **Detailed Project Report** | `https://github.com/entreskill-hub/entreskill-hub-platform/blob/main/docs/PROJECT_REPORT.md` | Comprehensive PRD, system architecture, data models, functional requirements, low-bandwidth mode specs, and KPI metrics. |
-| **Deployed Application** | `https://entreskill-hub.vercel.app` | Production deployment featuring interactive skill matching, 5-stage business roadmaps, financial cost estimator, mentor Q&A/booking, and low-bandwidth toggle. |
+| **Github Repository** | `https://github.com/shivamsingh018/entreskill-hub` | Complete source code, modular JS components, Tailwind CSS styling, Vercel configuration, and test scripts. |
+| **Detailed Project Report** | `https://github.com/shivamsingh018/entreskill-hub/blob/main/docs/PROJECT_REPORT.md` | Comprehensive PRD, system architecture, data models, functional requirements, low-bandwidth mode specs, and KPI metrics. |
+| **Deployed Application** | `https://shivamsingh018.github.io/entreskill-hub` | Production deployment featuring interactive skill matching, 5-stage business roadmaps, financial cost estimator, mentor Q&A/booking, and low-bandwidth toggle. |
 | **Feedback Video** | `https://www.youtube.com/watch?v=entreskill-hub-walkthrough-presentation` | 4-minute demonstration video covering platform features, user flows, architecture decisions, and developer learnings. |
 
 ---
 
-## Local Verification & Run Instructions
+## Push & Live Activation Command
 
-To test the application locally:
+Run this command in your terminal to push all local files to your GitHub account:
 ```bash
-# Navigate to project directory
 cd /Users/shivamsingh/.gemini/antigravity/scratch/entreskill-hub
-
-# Start local preview server on port 8080
-npm start
+git push -u origin main
 ```
-Then open `http://localhost:8080` in your web browser.
